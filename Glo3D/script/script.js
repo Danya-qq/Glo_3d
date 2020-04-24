@@ -47,26 +47,50 @@ window.addEventListener('DOMContentLoaded', function(){
             
     };
 
-    countTimer('24 april 2020');
+    countTimer('25 april 2020');
 
 // Menu
    
    const toggleMenu = () => {
 
-    const btnMenu = document.querySelector('.menu'),
+    const body = document.querySelector('body'),
+        btnMenu = document.querySelector('.menu'),
         menu = document.querySelector('menu'),
         closeBtn = document.querySelector('.close-btn'),
-        menuItems = menu.querySelectorAll('ul>li')
+        menuItems = menu.querySelectorAll('ul>li');
+
+        console.log(body);
+        
         
         const handlerMenu = () =>{
             menu.classList.toggle('active-menu')
         };
         
+        body.addEventListener('click', (event) =>{
+            let target = event.target;
+            console.log(target);
+            
+            target = target.closest('.menu')
+            console.log(target);
+            
+             if (!target){
+                 return
+             } else handlerMenu();
 
-        btnMenu.addEventListener('click', handlerMenu);
-        closeBtn.addEventListener('click', handlerMenu);
+            //  target = event.target;
+            //  if (target.classList.contains('close-btn')) {
+            //     handlerMenu();
+            //  }     
+        })
 
-        menuItems.forEach((elem) => elem.addEventListener('click', handlerMenu))
+        menu.addEventListener('click', (event) =>{
+            let target = event.target;
+            if (target.tagName === 'A') handlerMenu();
+        })
+        // btnMenu.addEventListener('click', handlerMenu);
+        // closeBtn.addEventListener('click', handlerMenu);
+
+        // menuItems.forEach((elem) => elem.addEventListener('click', handlerMenu))
     
 }
 
@@ -79,7 +103,27 @@ const togglePopUp = () =>{
     const popUp = document.querySelector('.popup'),
         popUpBtn = document.querySelectorAll('.popup-btn'),
         popUpCloseBtn = document.querySelector('.popup-close');
-        
+
+    
+    popUp.addEventListener('click', (event)  =>{
+        let target = event.target;
+
+        if (target.classList.contains('popup-close')){
+            if (screen.width >768) {
+                popUp.style.display = `none`;
+                popUp.firstElementChild.style.left = '0%'
+                count = 0; 
+            } else {
+                popUp.style.display = `none`;
+            }
+        };
+            target = target.closest('.popup-content'); // при нажатии по таргету и ниже по иеарархии, будет возвращаться блок с классом .popup-content, иначе !!!null
+            if (!target) {
+                popUp.style.display = 'none';
+            } 
+            
+    })
+
     let count = 0;
     let animate;
     let popUpAnimate = function(){ 
@@ -103,20 +147,68 @@ const togglePopUp = () =>{
                  
         })  
     }) 
-    popUpCloseBtn.addEventListener('click', () => {
-        if (screen.width >768) {
-            popUp.style.display = `none`;
-            popUp.firstElementChild.style.left = '0%'
-            count = 0; 
-        } else {
-            popUp.style.display = `none`;
-        }
-        
-    });
 }
 
 togglePopUp();
 
+// табы
+
+const tabs = () =>{
+    const tabHeader = document.querySelector('.service-header'),
+        tab = tabHeader.querySelectorAll('.service-header-tab'),
+        tabContent = document.querySelectorAll('.service-tab');
+
+    const toggleTabContent = (index) =>{
+        for (let i=0; i<tabContent.length; i++){
+            if (index === i) {
+                tab[i].classList.add('active');
+                tabContent[i].classList.remove('d-none');
+            } else {
+                tab[i].classList.remove('active');
+                tabContent[i].classList.add('d-none');
+            }
+        }
+    }
+
+    tabHeader.addEventListener('click', (event) =>{
+        let target = event.target; // получаем элемент, на который кликнули
+            console.log(target);
+            target = target.closest('.service-header-tab'); // метод closest ищет селектор и если находит,то возвращает элемент, если нет - null
+            console.log(target);
+
+            if(target) {
+                tab.forEach((item, i) =>{
+
+                    if (item === target){
+                         toggleTabContent(i);   
+                    }
+            
+                });
+            }
+            
+
+            // !ОСТАВИЛ ЦИКЛ ДЛЯ ПОНИМАНИЯ
+        // while (target !== tabHeader){
+        //     console.log(target);
+
+        //     if (target.classList.contains('service-header-tab')){
+                
+        //         tab.forEach((item, i) =>{
+
+        //             if (item === target){
+        //                 toggleTabContent(i);   
+        //             }
+
+        //         });
+        //         return;   
+        //     }
+        //     target = target.parentNode;
+        // }
+        
+    });
+}
+
+tabs();
 
 
 
