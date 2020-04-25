@@ -207,18 +207,11 @@ const slider = () =>{
         li.classList.add('dot')
         slider.lastElementChild.append(li)
     });   
-    // for (let i=0; i<slide.length; i++){
-    //     let li = document.createElement('li')
-    //     li.classList.add('dot')
-    //     slider.lastElementChild.append(li)
-    // };
-
+   
     let dot = document.querySelectorAll('.dot')
 
     let currentSlide = 0, // текущий слайд
         interval;
-
-
 
     const prevSlide = (elem, index, strClass) =>{
         elem[index].classList.remove(strClass);
