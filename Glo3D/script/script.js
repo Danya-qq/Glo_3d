@@ -136,198 +136,235 @@ const togglePopUp = () =>{
     }) 
 }
 
-togglePopUp();
+    togglePopUp();
 
-// табы
+    // табы
 
-const tabs = () =>{
-    const tabHeader = document.querySelector('.service-header'),
-        tab = tabHeader.querySelectorAll('.service-header-tab'),
-        tabContent = document.querySelectorAll('.service-tab');
+    const tabs = () =>{
+        const tabHeader = document.querySelector('.service-header'),
+            tab = tabHeader.querySelectorAll('.service-header-tab'),
+            tabContent = document.querySelectorAll('.service-tab');
 
-    const toggleTabContent = (index) =>{
-        for (let i=0; i<tabContent.length; i++){
-            if (index === i) {
-                tab[i].classList.add('active');
-                tabContent[i].classList.remove('d-none');
-            } else {
-                tab[i].classList.remove('active');
-                tabContent[i].classList.add('d-none');
+        const toggleTabContent = (index) =>{
+            for (let i=0; i<tabContent.length; i++){
+                if (index === i) {
+                    tab[i].classList.add('active');
+                    tabContent[i].classList.remove('d-none');
+                } else {
+                    tab[i].classList.remove('active');
+                    tabContent[i].classList.add('d-none');
+                }
             }
         }
+
+        tabHeader.addEventListener('click', (event) =>{
+            let target = event.target; // получаем элемент, на который кликнули
+                target = target.closest('.service-header-tab'); // метод closest ищет селектор и если находит,то возвращает элемент, если нет - null
+
+                if(target) {
+                    tab.forEach((item, i) =>{
+
+                        if (item === target){
+                            toggleTabContent(i);   
+                        }
+                
+                    });
+                }
+                
+
+                // !ОСТАВИЛ ЦИКЛ ДЛЯ ПОНИМАНИЯ
+            // while (target !== tabHeader){
+            //     console.log(target);
+
+            //     if (target.classList.contains('service-header-tab')){
+                    
+            //         tab.forEach((item, i) =>{
+
+            //             if (item === target){
+            //                 toggleTabContent(i);   
+            //             }
+
+            //         });
+            //         return;   
+            //     }
+            //     target = target.parentNode;
+            // }
+            
+        });
     }
 
-    tabHeader.addEventListener('click', (event) =>{
-        let target = event.target; // получаем элемент, на который кликнули
-            target = target.closest('.service-header-tab'); // метод closest ищет селектор и если находит,то возвращает элемент, если нет - null
+    tabs();
 
-            if(target) {
-                tab.forEach((item, i) =>{
+    // slider
 
-                    if (item === target){
-                         toggleTabContent(i);   
-                    }
+    const slider = () =>{
+        const slide = document.querySelectorAll('.portfolio-item'),
+            btn = document.querySelectorAll('.porfolio-btn'),
+            slider = document.querySelector('.portfolio-content');
+        
+        slide.forEach(() =>{
+            let li = document.createElement('li')
+            li.classList.add('dot')
+            slider.lastElementChild.append(li)
+        });   
+    
+        let dot = document.querySelectorAll('.dot');
+
+        let currentSlide = 0, // текущий слайд
+            interval;
+
+        const prevSlide = (elem, index, strClass) =>{
+            elem[index].classList.remove(strClass);
+        };
+
+        const nextSlide = (elem, index, strClass) =>{
+            elem[index].classList.add(strClass);    
+        };
+
+        const autoPlaySlide = () =>{
+            prevSlide(slide, currentSlide, 'portfolio-item-active');
+            prevSlide(dot, currentSlide, 'dot-active');
             
-                });
+            currentSlide++;
+
+            if (currentSlide >= slide.length){
+                currentSlide = 0;
+            };
+            
+            nextSlide(slide, currentSlide, 'portfolio-item-active');
+            nextSlide(dot, currentSlide, 'dot-active');
+    
+        };
+
+        const startSlide = (time = 3000) =>{
+            interval = setInterval(autoPlaySlide, time);
+        };
+
+        const stopSlide = () =>{
+            clearInterval(interval);
+        };
+
+        slider.addEventListener('click', (event) =>{
+            event.preventDefault();
+
+            let target = event.target;
+
+            if(!target.matches('.portfolio-btn, .dot')){ //  проверяем, кликнули ли по одному из элементов с указанным классом
+                return;  
+            }
+
+            prevSlide(slide, currentSlide, 'portfolio-item-active');
+            prevSlide(dot, currentSlide, 'dot-active');
+
+            if (target.matches('#arrow-right')){
+                currentSlide++;
+            } else if(target.matches('#arrow-left')){
+                currentSlide--;
+            } else if(target.matches('.dot')){
+                dot.forEach((elem, index) =>{
+                    if(elem === target){
+                        currentSlide =index;
+                    }
+                })
+            };
+
+            if(currentSlide >= slide.length){
+                currentSlide =0;
+            }
+
+            if(currentSlide <0){
+                currentSlide = slide.length -1
+            }
+
+            nextSlide(slide, currentSlide, 'portfolio-item-active');
+            nextSlide(dot, currentSlide, 'dot-active');
+
+        });
+
+        slider.addEventListener('mouseover', (event) =>{
+            if(event.target.matches('.portfolio-btn') || 
+            event.target.matches('.dot')){
+                stopSlide()
+            }
+        });
+
+        slider.addEventListener('mouseout', (event) =>{
+            if(event.target.matches('.portfolio-btn') || 
+            event.target.matches('.dot')){
+                startSlide()
+            };   
+        });
+
+        startSlide(1500)
+
+    };
+
+    slider();
+
+    // Блок "Наша команда"
+
+    const changeImage = () => {
+
+        const teamArea = document.querySelector('.command .row');
+        let images = teamArea.querySelectorAll('img');
+        
+        let sourceImg = [...images].map((elem) => {
+            return elem.src;  
+        });
+
+        let sourceData = [...images].map((elem) => {
+            return elem.dataset.img; 
+        });
+
+        const changeImg = (event, arr) => {
+            if (event.target.matches('img')) {
+                event.target.src = event.target.dataset.img;
+            }  
+        }
+
+        teamArea.addEventListener('mouseover', changeImg) 
+        teamArea.addEventListener('mouseout', (event) => {
+            if (event.target.matches('img')) {
+                sourceData.forEach((elem, index) => { 
+                
+                    if(event.target.src.slice(28) === elem) {
+                    event.target.src = sourceImg[index]
+                };
+                
+            });
+            
+            };
+        
+        })
+            
+
+    }
+
+    changeImage();
+
+
+
+//  Calculator
+
+    const validate = () => {
+
+        const calc = document.querySelector('.calc-block');
+
+        calc.addEventListener('input', (event) => {
+
+            if (event.target.matches('input')) {
+        
+                event.target.value = event.target.value.match(/^[0-9]*$/);         
+               
             }
             
+        })
 
-            // !ОСТАВИЛ ЦИКЛ ДЛЯ ПОНИМАНИЯ
-        // while (target !== tabHeader){
-        //     console.log(target);
-
-        //     if (target.classList.contains('service-header-tab')){
-                
-        //         tab.forEach((item, i) =>{
-
-        //             if (item === target){
-        //                 toggleTabContent(i);   
-        //             }
-
-        //         });
-        //         return;   
-        //     }
-        //     target = target.parentNode;
-        // }
-        
-    });
-}
-
-tabs();
-
-// slider
-
-const slider = () =>{
-    const slide = document.querySelectorAll('.portfolio-item'),
-        btn = document.querySelectorAll('.porfolio-btn'),
-        slider = document.querySelector('.portfolio-content');
-       
-    slide.forEach(() =>{
-        let li = document.createElement('li')
-        li.classList.add('dot')
-        slider.lastElementChild.append(li)
-    });   
-   
-    let dot = document.querySelectorAll('.dot')
-
-    let currentSlide = 0, // текущий слайд
-        interval;
-
-    const prevSlide = (elem, index, strClass) =>{
-        elem[index].classList.remove(strClass);
     };
 
-    const nextSlide = (elem, index, strClass) =>{
-        elem[index].classList.add(strClass);    
-    };
-
-    const autoPlaySlide = () =>{
-        prevSlide(slide, currentSlide, 'portfolio-item-active');
-        prevSlide(dot, currentSlide, 'dot-active');
-        
-        currentSlide++;
-
-        if (currentSlide >= slide.length){
-            currentSlide = 0;
-        };
-        
-        nextSlide(slide, currentSlide, 'portfolio-item-active');
-        nextSlide(dot, currentSlide, 'dot-active');
-  
-    };
-
-    const startSlide = (time = 3000) =>{
-        interval = setInterval(autoPlaySlide, time);
-    };
-
-    const stopSlide = () =>{
-        clearInterval(interval);
-    };
-
-    slider.addEventListener('click', (event) =>{
-        event.preventDefault();
-
-        let target = event.target;
-
-        if(!target.matches('.portfolio-btn, .dot')){ //  проверяем, кликнули ли по одному из элементов с указанным классом
-            return;  
-        }
-
-        prevSlide(slide, currentSlide, 'portfolio-item-active');
-        prevSlide(dot, currentSlide, 'dot-active');
-
-        if (target.matches('#arrow-right')){
-            currentSlide++;
-        } else if(target.matches('#arrow-left')){
-            currentSlide--;
-        } else if(target.matches('.dot')){
-            dot.forEach((elem, index) =>{
-                if(elem === target){
-                    currentSlide =index;
-                }
-            })
-        };
-
-        if(currentSlide >= slide.length){
-            currentSlide =0;
-        }
-
-        if(currentSlide <0){
-            currentSlide = slide.length -1
-        }
-
-        nextSlide(slide, currentSlide, 'portfolio-item-active');
-        nextSlide(dot, currentSlide, 'dot-active');
-
-    });
-
-    slider.addEventListener('mouseover', (event) =>{
-        if(event.target.matches('.portfolio-btn') || 
-        event.target.matches('.dot')){
-            stopSlide()
-        }
-    });
-
-    slider.addEventListener('mouseout', (event) =>{
-        if(event.target.matches('.portfolio-btn') || 
-        event.target.matches('.dot')){
-            startSlide()
-        };   
-    });
-
-    startSlide(1500)
-
-};
-
-slider();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
+    validate();
 
 
 });
+
+
