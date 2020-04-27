@@ -367,23 +367,90 @@ const togglePopUp = () =>{
 
 //  Calculator
 
-    const validate = () => {
+    const calc = (price = 100) => {
 
-        const calc = document.querySelector('.calc-block');
+        const calcBlock = document.querySelector('.calc-block'),
+            calcType = document.querySelector('.calc-type'),
+            calcSquare = document.querySelector('.calc-square'),
+            calcDay = document.querySelector('.calc-day'),
+            calcCount = document.querySelector('.calc-count'),
+            totalValue = document.getElementById('total');
 
-        calc.addEventListener('input', (event) => {
-
-            if (event.target.matches('input')) {
-        
-                event.target.value = event.target.value.match(/^[0-9]*$/);         
-               
-            }
+        // const animateOutNum = () => {
+        //    let n = 0,
+        //    step = 1;
+        //    console.log(total.value);
+           
             
-        })
+        //    let interval = setInterval(() => {
+        //        n = n + step;
+        //        if (n == total) {clearInterval(interval)};
+        //    }, 20)
+
+        // }
+            
+        const countSum = () => {
+            let total = 0,
+            countValue = 1,
+            dayValue = 1;
+
+            const typeValue = calcType.options[calcType.selectedIndex].value,
+            squareVaue = +calcSquare.value;
+            
+            if (calcCount.value > 1){
+                countValue += (calcCount.value -1) / 10;
+            };
+
+            if (calcDay.value && calcDay.value < 5) {
+                dayValue *=2;
+            } else if (calcDay.value && calcDay.value < 10) {
+                dayValue *= 1.5;
+            };
+            
+            if(typeValue && squareVaue){
+                total = price * typeValue * squareVaue * countValue * dayValue;
+            };
+            
+            // totalValue.textContent = total;
+            function animateOut(total) {
+                let n = 0,
+                step = 1;
+                if (total) {
+                let interval = setInterval(() => {
+                    n = n + step;
+                    
+                    if (n === total) {clearInterval(interval)};
+                    totalValue.textContent = n;
+                }, 10e-1)
+            }
+                    
+            
+            };
+            animateOut(total);
+        };
+
+        calcBlock.addEventListener('change', (event) => {
+            const target = event.target;
+            if (target.matches('.calc-type') || target.matches('.calc-square') 
+            || target.matches('.calc-day') || target.matches('.calc-count')) {
+                countSum();
+            };
+        
+        });
+
+        // calcBlock.addEventListener('input', (event) => {
+
+        //     if (event.target.matches('input')) {
+        
+        //         event.target.value = event.target.value.match(/^[0-9]*$/);        
+        //     };
+            
+        // });
 
     };
 
-    validate();
+    calc(100);
+
 
 
 });
