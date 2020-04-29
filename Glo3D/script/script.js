@@ -47,7 +47,7 @@ window.addEventListener('DOMContentLoaded', function(){
             
     };
 
-    countTimer('29 april 2020');
+    countTimer('01 may 2020');
 
 // Menu
 
@@ -376,24 +376,31 @@ const togglePopUp = () =>{
             calcCount = document.querySelector('.calc-count'),
             totalValue = document.getElementById('total');
 
-        // const animateOutNum = () => {
-        //    let n = 0,
-        //    step = 1;
-        //    console.log(total.value);
-           
-            
-        //    let interval = setInterval(() => {
-        //        n = n + step;
-        //        if (n == total) {clearInterval(interval)};
-        //    }, 20)
-
-        // }
+        let interval;
             
         const countSum = () => {
             let total = 0,
             countValue = 1,
             dayValue = 1;
+            clearInterval(interval)
+            
+            let n = 0,
+                step = 1;
 
+                interval = setInterval(() => {
+                
+                    if (total) {
+                        
+                    n = n + step;
+                
+                    if (n === total) {
+                        clearInterval(interval) 
+                        
+                    };
+                    totalValue.textContent = n;
+                }
+                }, 1);
+            
             const typeValue = calcType.options[calcType.selectedIndex].value,
             squareVaue = +calcSquare.value;
             
@@ -410,23 +417,7 @@ const togglePopUp = () =>{
             if(typeValue && squareVaue){
                 total = price * typeValue * squareVaue * countValue * dayValue;
             };
-            
-            // totalValue.textContent = total;
-            function animateOut(total) {
-                let n = 0,
-                step = 1;
-                if (total) {
-                let interval = setInterval(() => {
-                    n = n + step;
-                    
-                    if (n === total) {clearInterval(interval)};
-                    totalValue.textContent = n;
-                }, 10e-1)
-            }
-                    
-            
-            };
-            animateOut(total);
+
         };
 
         calcBlock.addEventListener('change', (event) => {
@@ -434,6 +425,7 @@ const togglePopUp = () =>{
             if (target.matches('.calc-type') || target.matches('.calc-square') 
             || target.matches('.calc-day') || target.matches('.calc-count')) {
                 countSum();
+                
             };
         
         });
