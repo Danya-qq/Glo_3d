@@ -377,6 +377,27 @@ const togglePopUp = () =>{
             totalValue = document.getElementById('total');
 
         let interval;
+
+        function animate({ duration, draw, timing }) {
+
+            let start = performance.now();
+    
+            requestAnimationFrame(function animate(time) {
+    
+                let timeFraction = (time - start) / duration;
+    
+                if (timeFraction > 1) timeFraction = 1;
+    
+                let progress = timing(timeFraction)
+    
+                draw(progress);
+    
+                if (timeFraction < 1) {
+                    requestAnimationFrame(animate);
+                }
+    
+            });
+        };
             
         const countSum = () => {
             let total = 0,
@@ -452,26 +473,141 @@ const togglePopUp = () =>{
         loadMessage = 'Загрузка...',
         successMessage = 'Спасибо! Мы скоро с Вами свяжемся!';
 
-        const form = document.getElementById('form1');
+        const form = document.getElementById('form1'),
+        form2 = document.getElementById('form2'),
+        form3 = document.getElementById('form3');
 
         const statusMessage = document.createElement('div');
         statusMessage.style.cssText = 'font-size: 2rem';
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        form.appendChild(statusMessage)
+        form.appendChild(statusMessage);
+        statusMessage.textContent = loadMessage;
+        // создаем спец объект, к-ый считывает данные с нашей формы
+        const formData = new FormData(form);       
+        let body = {};
 
-        const request = new XMLHttpRequest();
-        request.open('POST', './server.php');
-        request.setRequestHeader('Content-Type', 'multipart/form-data');
-        const formData = new FormData(form);
-        request.send(formData)
+        // получаем все данные из объекта formData, записываем в body
+        formData.forEach((value, key) => {
+            body[key] = value;
+        });
 
-
-
-
-
+        postData(body, () =>{
+            statusMessage.textContent = successMessage
+        }, (error) => {
+            console.error(error);
+            statusMessage.textContent = erorMessage;
+        })
+    
       });
+
+      form2.addEventListener('submit', (event) => {
+        event.preventDefault();
+        form2.appendChild(statusMessage);
+        statusMessage.textContent = loadMessage;
+        // создаем спец объект, к-ый считывает данные с нашей формы
+        const formData = new FormData(form2);       
+        let body = {};
+
+        // получаем все данные из объекта formData, записываем в body
+        formData.forEach((value, key) => {
+            body[key] = value;
+        });
+
+        postData(body, () =>{
+            statusMessage.textContent = successMessage
+        }, (error) => {
+            console.error(error);
+            statusMessage.textContent = erorMessage;
+        })
+    
+      });
+
+      form3.addEventListener('submit', (event) => {
+        event.preventDefault();
+        form3.appendChild(statusMessage);
+        statusMessage.textContent = loadMessage;
+        // создаем спец объект, к-ый считывает данные с нашей формы
+        const formData = new FormData(form3);       
+        let body = {};
+        
+        // получаем все данные из объекта formData, записываем в body
+        formData.forEach((value, key) => {
+            body[key] = value;
+        });
+
+        postData(body, () =>{
+            statusMessage.textContent = successMessage
+        }, (error) => {
+            console.error(error);
+            statusMessage.textContent = erorMessage;
+        })
+    
+      });  
+      const postData = (body, outputData, errorData) => {
+        // создаем экзэмпляр объекта
+        const request = new XMLHttpRequest(); 
+        // сразу после создания объекта, добавляем слушатель, чтобы отслеживать readystate, начиная с 1го;
+        request.addEventListener('readystatechange', () => { 
+            // проверяем событие от 1 до 4
+            if (request.readyState !== 4) return; 
+            // проверяем успешно ли получили ответ от сервера
+            if (request.status === 200) { 
+                outputData()
+            } else {
+                errorData(request.status);
+            };
+        })
+        //настраиваем запрос к серверу php
+        request.open('POST', './server.php'); 
+        // добавляем заголовки в формате JSON
+        request.setRequestHeader('Content-Type', 'application/json');
+        // данные отправляем на сервре в формате JSON
+        request.send(JSON.stringify(body));
+        // очищаем инпуты после отправки
+        [...event.target.elements].forEach((item) => {
+            if (item.tagName.toLowerCase() === 'input') {
+                item.value = '';                
+            }
+        });
+      };
+
+    };
+
+    sendForm();
+
+
+
+    // валидация инпутов
+    const validateForms = () => {
+
+    const form = document.getElementById('form1'),
+        form2 = document.getElementById('form2'),
+        form3 = document.getElementById('form3');
+
+    let forms = [...form.elements, ...form2.elements, ...form3.elements];
+
+    forms.forEach((item) => {
+        if (item.id && item.id.includes('phone')) {
+            item.addEventListener('input', () => {
+                
+               item.value =  item.value.match(/^\+[0-9]*$/)  
+            });
+        };
+
+        if (item.id.includes('name')) {
+            item.addEventListener('input', () => {
+                item.value = item.value.match(/[А-Яа-я\s]*$/)
+            })
+            
+        }
+        
+    });
+    
+    console.log(forms);
+        
+
 
 
 
@@ -482,7 +618,7 @@ const togglePopUp = () =>{
 
     };
 
-    sendForm()
+    validateForms();
 
 });
 
