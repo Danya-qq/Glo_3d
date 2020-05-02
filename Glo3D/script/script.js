@@ -47,7 +47,7 @@ window.addEventListener('DOMContentLoaded', function(){
             
     };
 
-    countTimer('01 may 2020');
+    countTimer('05 may 2020');
 
 // Menu
 
@@ -430,20 +430,59 @@ const togglePopUp = () =>{
         
         });
 
-        // calcBlock.addEventListener('input', (event) => {
+        calcBlock.addEventListener('input', (event) => {
 
-        //     if (event.target.matches('input')) {
+            if (event.target.matches('input')) {
         
-        //         event.target.value = event.target.value.match(/^[0-9]*$/);        
-        //     };
+                event.target.value = event.target.value.match(/^[0-9]*$/);        
+            };
             
-        // });
+        });
 
     };
 
     calc(100);
 
 
+
+//  send-ajax-form
+
+    const  sendForm = () => {
+        const erorMessage = 'Что-то пошло не так...',
+        loadMessage = 'Загрузка...',
+        successMessage = 'Спасибо! Мы скоро с Вами свяжемся!';
+
+        const form = document.getElementById('form1');
+
+        const statusMessage = document.createElement('div');
+        statusMessage.style.cssText = 'font-size: 2rem';
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        form.appendChild(statusMessage)
+
+        const request = new XMLHttpRequest();
+        request.open('POST', './server.php');
+        request.setRequestHeader('Content-Type', 'multipart/form-data');
+        const formData = new FormData(form);
+        request.send(formData)
+
+
+
+
+
+      });
+
+
+
+
+
+
+
+
+    };
+
+    sendForm()
 
 });
 
