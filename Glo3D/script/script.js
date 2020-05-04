@@ -376,8 +376,6 @@ const togglePopUp = () =>{
             calcCount = document.querySelector('.calc-count'),
             totalValue = document.getElementById('total');
 
-        let interval;
-
         function animate({ duration, draw, timing }) {
 
             let start = performance.now();
@@ -398,30 +396,27 @@ const togglePopUp = () =>{
     
             });
         };
-            
+             
         const countSum = () => {
             let total = 0,
             countValue = 1,
             dayValue = 1;
-            clearInterval(interval)
-            
-            let n = 0,
-                step = 1;
 
-                interval = setInterval(() => {
-                
-                    if (total) {
-                        
-                    n = n + step;
-                
-                    if (n === total) {
-                        clearInterval(interval) 
-                        
-                    };
-                    totalValue.textContent = n;
+            animate({
+                // скорость анимации
+                duration: 2000,
+                // Функция расчёта времени
+                timing(timeFraction) {
+                    return timeFraction;
+                },
+                // Функция отрисовки
+                draw(progress) {
+                    // в ней мы и производим вывод данных
+                    totalValue.textContent = Math.floor(progress * total)
+        
                 }
-                }, 1);
-            
+            });
+           
             const typeValue = calcType.options[calcType.selectedIndex].value,
             squareVaue = +calcSquare.value;
             
@@ -473,111 +468,72 @@ const togglePopUp = () =>{
         loadMessage = 'Загрузка...',
         successMessage = 'Спасибо! Мы скоро с Вами свяжемся!';
 
-        const form = document.getElementById('form1'),
+        const forms = document.querySelectorAll('form'),
         form2 = document.getElementById('form2'),
         form3 = document.getElementById('form3');
 
         const statusMessage = document.createElement('div');
         statusMessage.style.cssText = 'font-size: 2rem';
 
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        form.appendChild(statusMessage);
-        statusMessage.textContent = loadMessage;
-        // создаем спец объект, к-ый считывает данные с нашей формы
-        const formData = new FormData(form);       
-        let body = {};
+        forms.forEach(elem => {
+            elem.addEventListener('submit', (event) => {
+                event.preventDefault();
+                elem.appendChild(statusMessage);
+                statusMessage.textContent = loadMessage;
+                // создаем спец объект, к-ый считывает данные с нашей формы
+                const formData = new FormData(elem);       
+                let body = {};
 
-        // получаем все данные из объекта formData, записываем в body
-        formData.forEach((value, key) => {
-            body[key] = value;
-        });
+                // получаем все данные из объекта formData, записываем в body
+                formData.forEach((value, key) => {
+                    body[key] = value;
+                });
+                
+                postData(body)
+                    .then(() => statusMessage.textContent = successMessage)
+                    .catch(() => statusMessage.textContent = erorMessage)
+            });
 
-        postData(body, () =>{
-            statusMessage.textContent = successMessage
-        }, (error) => {
-            console.error(error);
-            statusMessage.textContent = erorMessage;
-        })
+        });    
+
+      const postData = (body) => {
+
+        return new Promise((resolve, reject) => {
+
+            // создаем экзэмпляр объекта
+            const request = new XMLHttpRequest(); 
+            // сразу после создания объекта, добавляем слушатель, чтобы отслеживать readystate, начиная с 1го;
+            request.addEventListener('readystatechange', () => { 
+                // проверяем событие от 1 до 4
+                if (request.readyState !== 4) return; 
+                // проверяем успешно ли получили ответ от сервера
+                if (request.status === 200) { 
+                    // outputData()
+                    resolve()
+                } else {
+                    // errorData(request.status);
+                    reject(request.status);
+                };
+            });
     
-      });
-
-      form2.addEventListener('submit', (event) => {
-        event.preventDefault();
-        form2.appendChild(statusMessage);
-        statusMessage.textContent = loadMessage;
-        // создаем спец объект, к-ый считывает данные с нашей формы
-        const formData = new FormData(form2);       
-        let body = {};
-
-        // получаем все данные из объекта formData, записываем в body
-        formData.forEach((value, key) => {
-            body[key] = value;
-        });
-
-        postData(body, () =>{
-            statusMessage.textContent = successMessage
-        }, (error) => {
-            console.error(error);
-            statusMessage.textContent = erorMessage;
-        })
-    
-      });
-
-      form3.addEventListener('submit', (event) => {
-        event.preventDefault();
-        form3.appendChild(statusMessage);
-        statusMessage.textContent = loadMessage;
-        // создаем спец объект, к-ый считывает данные с нашей формы
-        const formData = new FormData(form3);       
-        let body = {};
-        
-        // получаем все данные из объекта formData, записываем в body
-        formData.forEach((value, key) => {
-            body[key] = value;
-        });
-
-        postData(body, () =>{
-            statusMessage.textContent = successMessage
-        }, (error) => {
-            console.error(error);
-            statusMessage.textContent = erorMessage;
-        })
-    
-      });  
-      const postData = (body, outputData, errorData) => {
-        // создаем экзэмпляр объекта
-        const request = new XMLHttpRequest(); 
-        // сразу после создания объекта, добавляем слушатель, чтобы отслеживать readystate, начиная с 1го;
-        request.addEventListener('readystatechange', () => { 
-            // проверяем событие от 1 до 4
-            if (request.readyState !== 4) return; 
-            // проверяем успешно ли получили ответ от сервера
-            if (request.status === 200) { 
-                outputData()
-            } else {
-                errorData(request.status);
-            };
-        })
-        //настраиваем запрос к серверу php
-        request.open('POST', './server.php'); 
-        // добавляем заголовки в формате JSON
-        request.setRequestHeader('Content-Type', 'application/json');
-        // данные отправляем на сервре в формате JSON
-        request.send(JSON.stringify(body));
-        // очищаем инпуты после отправки
-        [...event.target.elements].forEach((item) => {
-            if (item.tagName.toLowerCase() === 'input') {
-                item.value = '';                
-            }
-        });
+            //настраиваем запрос к серверу php
+            request.open('POST', './server.php'); 
+            // добавляем заголовки в формате JSON
+            request.setRequestHeader('Content-Type', 'application/json');
+            // данные отправляем на сервре в формате JSON
+            request.send(JSON.stringify(body));
+            // очищаем инпуты после отправки
+            [...event.target.elements].forEach((item) => {
+                if (item.tagName.toLowerCase() === 'input') {
+                    item.value = '';                
+                }
+            });
+        })    
       };
 
     };
 
     sendForm();
-
-
 
     // валидация инпутов
     const validateForms = () => {
@@ -599,22 +555,9 @@ const togglePopUp = () =>{
         if (item.id.includes('name')) {
             item.addEventListener('input', () => {
                 item.value = item.value.match(/[А-Яа-я\s]*$/)
-            })
-            
-        }
-        
+            })    
+        };     
     });
-    
-    console.log(forms);
-        
-
-
-
-
-
-
-
-
 
     };
 
