@@ -5,12 +5,13 @@ window.addEventListener('DOMContentLoaded', function(){
     function countTimer(deadline){
         let timerHours = document.querySelector('#timer-hours'),
             timerMinutes = document.querySelector('#timer-minutes'),
-            timerSeconds = document.querySelector('#timer-seconds');
+            timerSeconds = document.querySelector('#timer-seconds'),
+            idInterval;
             
         // day = Math.floor(timeRemaining / 60 / 60 /24)
 
          function getTimeRemaining(){
-           let dateStop = new Date(deadline).getTime(),
+           let dateStop = new Date(deadline),
                 dateNow = new Date().getTime(),
                 timeRemaining = (dateStop - dateNow)/1000,
                 seconds = Math.floor(timeRemaining % 60),
@@ -43,11 +44,11 @@ window.addEventListener('DOMContentLoaded', function(){
          }
          updateClock();
     
-        let idInterval = setInterval(updateClock, 1000);
+        idInterval = setInterval(updateClock, 1000);
             
     };
 
-    countTimer('05 may 2020');
+    countTimer('10 may 2020');
 
 // Menu
 
@@ -481,56 +482,50 @@ const togglePopUp = () =>{
                 elem.appendChild(statusMessage);
                 statusMessage.textContent = loadMessage;
                 // создаем спец объект, к-ый считывает данные с нашей формы
-                const formData = new FormData(elem);       
+                const formData = new FormData(elem); 
+                      
                 let body = {};
 
                 // получаем все данные из объекта formData, записываем в body
-                formData.forEach((value, key) => {
+                formData.forEach((value, key) => {    
                     body[key] = value;
+                });
+
+                // очищаем инпуты после отправки
+                 [...event.target.elements].forEach((item) => {
+                     if (item.tagName.toLowerCase() === 'input') {
+                    item.value = '';                
+                    }
                 });
                 
                 postData(body)
-                    .then(() => statusMessage.textContent = successMessage)
-                    .catch(() => statusMessage.textContent = erorMessage)
+                    .then((response) => {
+                        if (response.status !== 200) {
+                            throw new Error ('Status network is not 200')
+                        }
+
+                        statusMessage.textContent = successMessage
+                    })
+                    .catch((error) => {
+                        statusMessage.textContent = erorMessage;
+                        console.error(error); 
+                    }); 
+
             });
 
         });    
 
       const postData = (body) => {
-
-        return new Promise((resolve, reject) => {
-
-            // создаем экзэмпляр объекта
-            const request = new XMLHttpRequest(); 
-            // сразу после создания объекта, добавляем слушатель, чтобы отслеживать readystate, начиная с 1го;
-            request.addEventListener('readystatechange', () => { 
-                // проверяем событие от 1 до 4
-                if (request.readyState !== 4) return; 
-                // проверяем успешно ли получили ответ от сервера
-                if (request.status === 200) { 
-                    // outputData()
-                    resolve()
-                } else {
-                    // errorData(request.status);
-                    reject(request.status);
-                };
-            });
-    
-            //настраиваем запрос к серверу php
-            request.open('POST', './server.php'); 
-            // добавляем заголовки в формате JSON
-            request.setRequestHeader('Content-Type', 'application/json');
-            // данные отправляем на сервре в формате JSON
-            request.send(JSON.stringify(body));
-            // очищаем инпуты после отправки
-            [...event.target.elements].forEach((item) => {
-                if (item.tagName.toLowerCase() === 'input') {
-                    item.value = '';                
-                }
-            });
-        })    
+        // создаем Fetch
+        return fetch('./server.php', { // url, второй аргумент - объект настроек
+            // проиписываем метод, по дефолту - GET
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        }) 
       };
-
     };
 
     sendForm();
@@ -562,6 +557,9 @@ const togglePopUp = () =>{
     };
 
     validateForms();
+
+    console.log(2);
+    
 
 });
 
