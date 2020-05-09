@@ -509,7 +509,12 @@ const togglePopUp = () =>{
                     .catch((error) => {
                         statusMessage.textContent = erorMessage;
                         console.error(error); 
-                    }); 
+                    })
+                    .finally(() => {
+                        setTimeout(() => {
+                            statusMessage.textContent = ''
+                        }, 5000)
+                    });
 
             });
 
