@@ -14,7 +14,7 @@ import validateForms from './modules/validateForms.js'
 
 
 // Timer
-    countTimer('10 may 2020');
+    countTimer('15 may 2020');
 
 // Menu
     toggleMenu();

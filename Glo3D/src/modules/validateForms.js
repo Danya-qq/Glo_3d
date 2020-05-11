@@ -18,7 +18,24 @@ const validateForms = () => {
             item.addEventListener('input', () => {
                 item.value = item.value.match(/[А-Яа-я\s]*$/)
             })    
-        };     
+        }; 
+        
+        if (item.id.includes('name')) {
+            item.addEventListener('input', () => {
+                item.value = item.value.match(/[А-Яа-я\s]*$/)
+            })    
+        }; 
+        
+        if (item.id.includes('message')) {
+            item.addEventListener('input', () => {
+                item.value = item.value.match(/[А-Яа-я\s?,.:""]*$/)
+            })    
+        }; 
+        if (item.id.includes('email')) {
+            item.addEventListener('input', () => {
+                item.value = item.value.match(/[\w+\d+@.]+/)
+            })    
+        }; 
     });
 
     };
